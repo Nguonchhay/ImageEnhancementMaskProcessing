@@ -40,8 +40,8 @@ public class JDemo extends JFrame implements ActionListener {
 		/**************Menu Help**********************/
 		JMenu help=new JMenu("Help");
 		help.setMnemonic('h');
-		JMenuItem helpViewHelp=new JMenuItem("How to use this system");
-		JMenuItem helpAbout=new JMenuItem("Group 3");	
+		JMenuItem helpViewHelp=new JMenuItem("How to use");
+		JMenuItem helpAbout=new JMenuItem("Group 2");	
 		help.add(helpViewHelp);
 		help.add(helpAbout);
 		helpViewHelp.addActionListener(new ActionListener(){

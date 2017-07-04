@@ -7,8 +7,8 @@ Maintainers
 -----------
 
 * Nguonchhay Touch
-* Putthira Test
-* Udom Mey
+* Putthira Tes
+* Odom Mey
 
 Requirement
 ------------
