@@ -114,7 +114,10 @@ public class JDemo extends JFrame implements ActionListener {
 		rightPanel.add(lblMethod);
 		method = new JComboBox();
 		method.setBounds(280, 135, 200, 50);
-		method.addItem("Average filtering");
+		method.addItem("Linear filters");
+		method.addItem("Mean Filter");
+		method.addItem("Weighted Average");
+		method.addItem("Median Filter");
 		method.setSelectedIndex(0);
 		rightPanel.add(method);
 		
@@ -133,7 +136,7 @@ public class JDemo extends JFrame implements ActionListener {
 		padding = new JComboBox();
 		padding.setBounds(280, 215, 200, 50);
 		padding.addItem("Zero padding");
-		padding.addItem("Repeat value");
+		padding.addItem("Replicated value");
 		padding.setSelectedIndex(0);
 		rightPanel.add(padding);
 		
