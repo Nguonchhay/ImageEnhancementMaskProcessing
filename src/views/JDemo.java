@@ -4,6 +4,9 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.filechooser.FileSystemView;
 
+import models.AbstractFilter;
+import models.FileProcess;
+import models.Item;
 import models.Window;
 
 import java.awt.*;
@@ -19,9 +22,10 @@ public class JDemo extends JFrame implements ActionListener {
 	JButton browseImage;
 	JButton apply;
 	JLabel originalImage;
-	JComboBox method;
-	JTextField kernel;
+	JComboBox method, kernel;
 	JComboBox padding;
+	AbstractFilter filter = null;
+	String selectedImagePath ="";
 
 	public JDemo() {
 		super("Mask Image Enhancement");
@@ -40,31 +44,23 @@ public class JDemo extends JFrame implements ActionListener {
 		/***********Menu File************************/
 		JMenu file=new JMenu("File");
 			file.setMnemonic('f');
-		JMenuItem fileNew=new JMenuItem("New                         Ctrl + N");
-			fileNew.setMnemonic('n');
-		JMenuItem fileOpen=new JMenuItem("Open image file     Ctrl + O");
-		JMenuItem fileSave=new JMenuItem("Save                        Ctrl + S");
-		JMenuItem fileSaveAs=new JMenuItem("Save As ... ");
+		JMenuItem fileOpen=new JMenuItem("Broese image     Ctrl + O");
 		JMenuItem fileExit=new JMenuItem("Exit                         Ctrl + Q");
 		
-		file.add(fileNew);
 		file.add(fileOpen);
-		file.add(fileSave);
-		file.add(fileSaveAs);		
+		fileOpen.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				browseFile();
+			}
+		});
+		
 		file.add(fileExit);
 		
 		/**************Menu Help**********************/
 		JMenu help=new JMenu("Help");
 		help.setMnemonic('h');
-		JMenuItem helpViewHelp=new JMenuItem("How to use");
-		JMenuItem helpAbout=new JMenuItem("Group 2");	
-		help.add(helpViewHelp);
+		JMenuItem helpAbout=new JMenuItem("Group 2");
 		help.add(helpAbout);
-		helpViewHelp.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				new ViewHelp().setVisible(true);
-			}
-		});
 		helpAbout.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				new ViewAbout().setVisible(true);
@@ -114,9 +110,7 @@ public class JDemo extends JFrame implements ActionListener {
 		rightPanel.add(lblMethod);
 		method = new JComboBox();
 		method.setBounds(280, 135, 200, 50);
-		method.addItem("Linear filters");
-		method.addItem("Mean Filter");
-		method.addItem("Weighted Average");
+		method.addItem("Mean Filter (Average Filter)");
 		method.addItem("Median Filter");
 		method.setSelectedIndex(0);
 		rightPanel.add(method);
@@ -125,7 +119,10 @@ public class JDemo extends JFrame implements ActionListener {
 		JLabel lblKernel = new JLabel("Kernels: ");
 		lblKernel.setBounds(150, 180, 150, 35);
 		rightPanel.add(lblKernel);
-		kernel = new JTextField("3 x 3");
+		kernel = new JComboBox();
+		kernel.addItem(new Item(3, "3 x 3"));
+		kernel.addItem(new Item(5, "5 x 5"));
+		kernel.addItem(new Item(7, "7 x 7"));
 		kernel.setBounds(280, 180, 200, 35);
 		rightPanel.add(kernel);
 		
@@ -135,8 +132,8 @@ public class JDemo extends JFrame implements ActionListener {
 		rightPanel.add(lblPadding);
 		padding = new JComboBox();
 		padding.setBounds(280, 215, 200, 50);
-		padding.addItem("Zero padding");
-		padding.addItem("Replicated value");
+		padding.addItem(new Item(0, "Zero padding"));
+		padding.addItem(new Item(1, "Replicated value"));
 		padding.setSelectedIndex(0);
 		rightPanel.add(padding);
 		
@@ -151,19 +148,36 @@ public class JDemo extends JFrame implements ActionListener {
 		panel.add(rightPanel);
 		getContentPane().add(panel);
 	}
+	
+	public void browseFile() {
+		JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+		int returnValue = jfc.showOpenDialog(null);
+
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
+			File selectedFile = jfc.getSelectedFile();
+			originalImage.setIcon(new ImageIcon(new javax.swing.ImageIcon(selectedFile.getAbsolutePath()).getImage().getScaledInstance(this.ORIGINAL_IMAGE_WIDTH, this.ORIGINAL_IMAGE_HEIGHT, Image.SCALE_SMOOTH)));
+			selectedImagePath = selectedFile.getAbsolutePath();
+		}
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (event.getSource() == browseImage) {
-			JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-			int returnValue = jfc.showOpenDialog(null);
-
-			if (returnValue == JFileChooser.APPROVE_OPTION) {
-				File selectedFile = jfc.getSelectedFile();
-				originalImage.setIcon(new ImageIcon(new javax.swing.ImageIcon(selectedFile.getAbsolutePath()).getImage().getScaledInstance(this.ORIGINAL_IMAGE_WIDTH, this.ORIGINAL_IMAGE_HEIGHT, Image.SCALE_SMOOTH)));
-			}
+			browseFile();
 		} else if (event.getSource() == apply) {
-			JOptionPane.showMessageDialog(this, "Apply enhancement techniques...");
+			filter = AbstractFilter.getFilter(method.getSelectedItem().toString());
+			filter.setPath(selectedImagePath);
+			
+			Item itemKernel = (Item) kernel.getSelectedItem();
+			filter.setKernal(itemKernel.getId());
+			
+			Item itemPadding = (Item) padding.getSelectedItem();
+			filter.setPadding(itemPadding.getId());
+			
+			filter.enhanceImage();
+			if (JOptionPane.showConfirmDialog(this, "Enhancement process is complete. Do you want to display image?") == JOptionPane.OK_OPTION) {
+				new ViewImage(FileProcess.getCurrentPath() + "/images/" + filter.getFilename()).setVisible(true);
+			}
 		}
 	}
 	

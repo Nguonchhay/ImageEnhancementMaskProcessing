@@ -24,7 +24,7 @@ public class MyImagePanel extends JPanel{
 	}
 	
 	public void paint(Graphics g){
-		Image img=new ImageIcon(FileProcess.getCurrentPath()+"/images/"+image).getImage();
+		Image img=new ImageIcon(image).getImage();
 		g.drawImage(img, 0, 0, w, h, this);
 	}
 }

@@ -46,6 +46,7 @@ public class FileProcess {
 		}
 		return str;
 	}
+
 	public static String getCurrentPath(){
 		return new File("").getAbsolutePath();
 	}
